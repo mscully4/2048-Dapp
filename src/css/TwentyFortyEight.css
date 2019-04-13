@@ -1,0 +1,33 @@
+.title {
+    text-align: center;
+}
+
+.grid {
+    display: grid;
+    grid-template-rows: 100px 100px 100px 100px;
+    grid-template-columns: 100px 100px 100px 100px;
+    justify-content: center;
+    grid-row-gap: 10px;
+    grid-column-gap: 10px;
+}
+
+.item {
+    display: flex;
+    border: solid 3px black;
+    border-radius: 10px;
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.options {
+    margin: 25px;
+    text-align: center;
+}
+
+.moves {
+    text-align: center;
+    display: none;
+    margin: 25px;
+}
