@@ -19,20 +19,19 @@ contract TwentyFortyEight {
         for (uint i=0; i<16; ++i) {
             boof[i] = 0;
         }
-       
-        //generating random numbers is a pain... 
-        uint rand = random(15);
-        boof[rand] = random(2) * 2;
-        if (random(14) != rand) {
-            boof[random(14)] = random((random(13) % 2) + 1) * 2; 
-        } else if (random(13) != rand) {
-            boof[random(13)] = random((random(12) % 2) + 1) * 2;
-        } else {
-            boof[16-rand] = 2;
+        boof[random(15)] = 2;
+
+        uint[] memory temp; 
+        games[gameCounter] = game(gameCounter, true, boof, temp, false);
+        
+        for (uint j=0; j<16; ++j) {
+            if (games[gameCounter].board[j] == 0) {
+                games[gameCounter].empty.push(j);
+            }
         }
+
+        games[gameCounter].board[games[gameCounter].empty[random(14) - 1]] = 2;
        
-        uint[] memory chork; 
-        games[gameCounter] = game(gameCounter, true, boof, chork, false);
         emit gameStarted(gameCounter);
     }
 
@@ -47,6 +46,7 @@ contract TwentyFortyEight {
     }
 
     function moveDown(uint gameId) public {
+        require(games[gameId].isOver == false, "Game is Over");
         uint[16] memory board = games[gameId].board;
         for (uint i=15; i>=0 && i<16; --i) {
             if (board[i] > 0) {
@@ -67,22 +67,30 @@ contract TwentyFortyEight {
             }
         }
         games[gameId].board = board;
-        addTile(gameId);
+        if (isLost(gameId) == true || isWon(gameId) == true) {
+            games[gameId].isOver = true;
+        } else {
+            addTile(gameId);
+        }
     }
 
     function moveUp(uint gameId) public {
+        require(games[gameId].isOver == false, "Game is Over");
         uint[16] memory board = games[gameId].board;
+        bool didMove = false;
         for (uint i=0; i<16; ++i) {
             if (board[i] > 0) {
                 for (uint j=i%4; j<i; j+=4) {
                     if (board[j] == 0) {
                         board[j] = board[i];
                         board[i] = 0;
+                        didMove = true;
                         break;
                     } else if (board[j] == board[i] && board[i] != 0) {
                         if ((i-j == 4) || (i-j == 8 && board[j+4] == 0) || (i-j == 12 && board[j+4] == 0 && board[j+8] == 0)) {
                             board[j] = board[i] + board[j];
                             board[i] = 0;
+                            didMove = true;
                             break;
                         }
                     }
@@ -90,22 +98,30 @@ contract TwentyFortyEight {
             }
         }
         games[gameId].board = board;
-        addTile(gameId);
+        if (isLost(gameId) == true || isWon(gameId) == true) {
+            games[gameId].isOver = true;
+        } else if (didMove) {
+            addTile(gameId);
+        } 
     }
 
     function moveRight(uint gameId) public {
+        require(games[gameId].isOver == false, "Game is Over");
         uint[16] memory board = games[gameId].board;
+        bool didMove = false;
         for (uint i=15; i>=0 && i<16; --i) {
             if (board[i] > 0) {
                 for (uint j=i-(i%4)+3; j>i; --j) {
                     if (board[j] == 0) {
                         board[j] = board[i];
                         board[i] = 0;
+                        didMove = false;
                         break;
                    } else if (board[j] == board[i] && board[i] != 0) {
                         if ((j-i == 1) || (j-i == 2 && board[j-1] == 0) || (j-i == 3 && board[j-1] == 0 && board[j-2] == 0)) {
                             board[j] = board[i] + board[j];
                             board[i] = 0;
+                            didMove = false;
                             break;
                         }
                    }
@@ -113,22 +129,30 @@ contract TwentyFortyEight {
             }
         }
         games[gameId].board = board;
-        addTile(gameId);
+        if (isLost(gameId) == true || isWon(gameId) == true) {
+            games[gameId].isOver = true;
+        } else if (didMove) {
+            addTile(gameId);
+        }
     }
 
     function moveLeft(uint gameId) public {
+        require(games[gameId].isOver == false, "Game is Over");
         uint[16] memory board = games[gameId].board;
+        bool didMove = false;
         for (uint i=0; i<16; ++i) {
             if (board[i] > 0) {
                 for (uint j=(i/4)*4; j<i; ++j) {
                     if (board[j] == 0) {
                         board[j] = board[i];
                         board[i] = 0;
+                        didMove = false;
                         break;
                     } else if (board[j] == board[i] && board[i] != 0) {
                         if ((i-j == 1) || (i-j == 2 && board[j+1] == 0) || (i-j == 3 && board[j+1] == 0 && board[j+2] == 0)) {
                             board[j] = board[i] + board[j];
                             board[i] = 0;
+                            didMove = false;
                             break;
                         }
                     }
@@ -136,7 +160,11 @@ contract TwentyFortyEight {
             }
         }
         games[gameId].board = board;
-        addTile(gameId);
+        if (isLost(gameId) == true || isWon(gameId) == true) {
+            games[gameId].isOver = true;
+        } else if (didMove) {
+            addTile(gameId);
+        }
     }
 
     function addTile(uint gameId) public {
@@ -198,8 +226,6 @@ contract TwentyFortyEight {
     function isWon(uint gameId) public view returns (bool) {
         for (uint i=0; i<16; ++i) {
            if (games[gameId].board[i] >= 2048) {
-                //games[gameId].isOver = true;
-                //emit gameWon(gameId);
                 return true;
                 break;
            } 

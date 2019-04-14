@@ -49,12 +49,13 @@ App = {
             chork.startGame().then(function(){
                 chork.gameStarted().watch(function(error, result) {
                     if (!error) {
+                        console.log(result.args.gameId.toNumber());
                         App.loadBoard(result.args.gameId.toNumber());
                     } else {
                         console.log(error);
                     }
                 })
-            })
+            }, 5000)
         });
 
         $(".load-game").click(function() {
@@ -114,40 +115,40 @@ App = {
     },   
 
     moveUp: function() {
-        chork.moveUp($(".game-id").val()).then(function() {
+        chork.moveUp(parseInt($("#game-number").text())).then(function() {
             $(".moves").hide();
             setTimeout(function() {
-                App.loadBoard($(".game-id").val());
+                App.loadBoard(parseInt($("#game-number").text()));
                 $(".moves").show();
             }, 5000);
         })
     },
 
     moveDown: function () {
-        chork.moveDown($(".game-id").val()).then(function() {
+        chork.moveDown(parseInt($("#game-number").text())).then(function() {
             $(".moves").hide();
             setTimeout(function() {
-                App.loadBoard($(".game-id").val());
+                App.loadBoard(parseInt($("#game-number").text()));
                 $(".moves").show();
             }, 5000);
         })
     },
 
     moveLeft: function () {
-        chork.moveLeft($(".game-id").val()).then(function() {
+        chork.moveLeft(parseInt($("#game-number").text())).then(function() {
             $(".moves").hide();
             setTimeout(function() {
-                App.loadBoard($(".game-id").val());
+                App.loadBoard(parseInt($("#game-number").text()));
                 $(".moves").show();
             }, 5000);
         })
     },
 
     moveRight: function() {
-        chork.moveRight($(".game-id").val()).then(function() {
+        chork.moveRight(parseInt($("#game-number").text())).then(function() {
             $(".moves").hide();
             setTimeout(function() {
-                App.loadBoard($(".game-id").val());
+                App.loadBoard(parseInt($("#game-number").text()));
                 $(".moves").show();
             }, 5000);
         })
